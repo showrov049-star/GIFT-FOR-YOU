@@ -1,0 +1,292 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data) {
+      return data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+             data.email is string && data.email.size() <= 150 &&
+             (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 500)) &&
+             data.notifyOnOpen is bool &&
+             data.notifyOnReply is bool &&
+             data.defaultAllowSkip is bool;
+    }
+
+    function isValidSurprise(data) {
+      return data.creatorUid is string && data.creatorUid.size() >= 1 && data.creatorUid.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.categoryId is string && data.categoryId.size() >= 1 && data.categoryId.size() <= 50 &&
+             data.recipientName is string && data.recipientName.size() >= 1 && data.recipientName.size() <= 80 &&
+             data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 80 &&
+             data.introMessage is string && data.introMessage.size() <= 300 &&
+             data.mainMessage is string && data.mainMessage.size() >= 1 && data.mainMessage.size() <= 5000 &&
+             data.fontStyle in ['playfair', 'poppins', 'inter', 'handwritten'] &&
+             data.textAlignment in ['start', 'center', 'end'] &&
+             data.textColorHex is string && data.textColorHex.size() >= 4 && data.textColorHex.size() <= 12 &&
+             data.boldBody is bool &&
+             data.italicBody is bool &&
+             data.photos is list && data.photos.size() <= 4 &&
+             (data.photos.size() == 0 || (data.photos[0] is string && data.photos[0].size() <= 220000)) &&
+             data.photoCaptions is list && data.photoCaptions.size() <= 4 &&
+             (data.photoCaptions.size() == 0 || (data.photoCaptions[0] is string && data.photoCaptions[0].size() <= 200)) &&
+             (!('voiceNoteAudioBase64' in data) || (data.voiceNoteAudioBase64 is string && data.voiceNoteAudioBase64.size() <= 250000)) &&
+             (!('voiceNoteTranscript' in data) || (data.voiceNoteTranscript is string && data.voiceNoteTranscript.size() <= 500)) &&
+             data.voiceDurationSec is int && data.voiceDurationSec >= 0 && data.voiceDurationSec <= 120 &&
+             data.musicTrackId is string && data.musicTrackId.size() <= 50 &&
+             (data.musicVolume is float || data.musicVolume is int) && data.musicVolume >= 0 && data.musicVolume <= 1 &&
+             data.themeId is string && data.themeId.size() >= 1 && data.themeId.size() <= 50 &&
+             data.customBgColorHex is string && data.customBgColorHex.size() <= 12 &&
+             data.cardStyle in ['glass', 'polaroid', 'parchment', 'velvet'] &&
+             data.animationEffect in ['hearts', 'sparkles', 'petals', 'confetti', 'stars'] &&
+             data.envelopeStyle in ['wax_seal', 'ribbon_fold', 'starry_mail'] &&
+             data.giftBoxStyle in ['classic_rose', 'lavender_silk', 'golden_royal'] &&
+             data.selectedGames is list && data.selectedGames.size() <= 8 &&
+             (data.selectedGames.size() == 0 || (data.selectedGames[0] is string && data.selectedGames[0].size() <= 40)) &&
+             data.gameDifficulty in ['easy', 'medium', 'hard'] &&
+             data.gamesMandatory is bool &&
+             data.allowSkip is bool &&
+             data.secretCodeClue is string && data.secretCodeClue.size() <= 200 &&
+             data.secretCodeAnswer is string && data.secretCodeAnswer.size() <= 80 &&
+             data.secretPasscode is string && data.secretPasscode.size() <= 40 &&
+             data.unlockAtMillis is int && data.unlockAtMillis >= 0 &&
+             data.eventDateMillis is int && data.eventDateMillis >= 0 &&
+             data.expiresAtMillis is int && data.expiresAtMillis >= 0 &&
+             data.status in ['draft', 'published', 'opened', 'replied', 'expired'] &&
+             data.openCount is int && data.openCount >= 0 &&
+             data.replyCount is int && data.replyCount >= 0 &&
+             (!('publishedAt' in data) || (data.publishedAt is timestamp && data.publishedAt <= request.time));
+    }
+
+    function isValidReply(data) {
+      return data.surpriseId is string && isValidId(data.surpriseId) &&
+             data.creatorUid is string && data.creatorUid.size() >= 1 && data.creatorUid.size() <= 128 &&
+             data.surpriseTitle is string && data.surpriseTitle.size() <= 120 &&
+             data.recipientName is string && data.recipientName.size() >= 1 && data.recipientName.size() <= 80 &&
+             data.reaction in ['loved_it', 'so_cute', 'made_me_laugh', 'emotional', 'i_love_it'] &&
+             data.message is string && data.message.size() >= 1 && data.message.size() <= 1500 &&
+             data.emojiTag is string && data.emojiTag.size() <= 20 &&
+             (!('photoBase64' in data) || (data.photoBase64 is string && data.photoBase64.size() <= 220000)) &&
+             data.readFlag is bool;
+    }
+
+    function isValidNotification(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.surpriseId is string && isValidId(data.surpriseId) &&
+             data.type in ['opened', 'replied', 'reacted'] &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.message is string && data.message.size() >= 1 && data.message.size() <= 400 &&
+             data.readFlag is bool;
+    }
+
+    function isValidSurpriseEvent(data) {
+      return data.surpriseId is string && isValidId(data.surpriseId) &&
+             data.creatorUid is string && data.creatorUid.size() >= 1 && data.creatorUid.size() <= 128 &&
+             data.eventType in ['opened', 'game_completed', 'letter_read', 'replied'] &&
+             data.anonymousSessionId is string && data.anonymousSessionId.size() >= 1 && data.anonymousSessionId.size() <= 128;
+    }
+
+    // 1. Private User Profiles
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn() &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId &&
+                       incoming().uid == request.auth.uid &&
+                       incoming().keys().hasAll(['uid', 'displayName', 'email', 'notifyOnOpen', 'notifyOnReply', 'defaultAllowSkip', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['uid', 'displayName', 'email', 'photoUrl', 'notifyOnOpen', 'notifyOnReply', 'defaultAllowSkip', 'createdAt', 'updatedAt']) &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(userId) &&
+                       request.auth.uid == userId &&
+                       incoming().uid == existing().uid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email', 'photoUrl', 'notifyOnOpen', 'notifyOnReply', 'defaultAllowSkip', 'updatedAt']);
+
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+    }
+
+    // 2. Surprises (Creator full control; recipient read/counter increment only on published surpriseId)
+    match /surprises/{surpriseId} {
+      allow get: if isValidId(surpriseId) &&
+                    ((isSignedIn() && resource.data.creatorUid == request.auth.uid) ||
+                     (resource.data.status in ['published', 'opened', 'replied']));
+
+      allow list: if isSignedIn() && resource.data.creatorUid == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+                       isValidId(surpriseId) &&
+                       incoming().creatorUid == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'creatorUid', 'title', 'categoryId', 'recipientName', 'senderName',
+                         'introMessage', 'mainMessage', 'fontStyle', 'textAlignment', 'textColorHex',
+                         'boldBody', 'italicBody', 'photos', 'photoCaptions', 'voiceDurationSec',
+                         'musicTrackId', 'musicVolume', 'themeId', 'customBgColorHex', 'cardStyle',
+                         'animationEffect', 'envelopeStyle', 'giftBoxStyle', 'selectedGames',
+                         'gameDifficulty', 'gamesMandatory', 'allowSkip', 'secretCodeClue',
+                         'secretCodeAnswer', 'secretPasscode', 'unlockAtMillis', 'eventDateMillis',
+                         'expiresAtMillis', 'status', 'openCount', 'replyCount', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'creatorUid', 'title', 'categoryId', 'recipientName', 'senderName',
+                         'introMessage', 'mainMessage', 'fontStyle', 'textAlignment', 'textColorHex',
+                         'boldBody', 'italicBody', 'photos', 'photoCaptions',
+                         'voiceNoteAudioBase64', 'voiceNoteTranscript', 'voiceDurationSec',
+                         'musicTrackId', 'musicVolume', 'themeId', 'customBgColorHex', 'cardStyle',
+                         'animationEffect', 'envelopeStyle', 'giftBoxStyle', 'selectedGames',
+                         'gameDifficulty', 'gamesMandatory', 'allowSkip', 'secretCodeClue',
+                         'secretCodeAnswer', 'secretPasscode', 'unlockAtMillis', 'eventDateMillis',
+                         'expiresAtMillis', 'status', 'openCount', 'replyCount',
+                         'createdAt', 'updatedAt', 'publishedAt'
+                       ]) &&
+                       incoming().openCount == 0 &&
+                       incoming().replyCount == 0 &&
+                       incoming().status in ['draft', 'published'] &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                       isValidSurprise(incoming());
+
+      allow update: if isValidId(surpriseId) &&
+                       incoming().creatorUid == existing().creatorUid &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                       isValidSurprise(incoming()) && (
+                         // Branch 1: Creator full edit
+                         (isSignedIn() && existing().creatorUid == request.auth.uid &&
+                          incoming().diff(existing()).affectedKeys().hasOnly([
+                            'title', 'categoryId', 'recipientName', 'senderName',
+                            'introMessage', 'mainMessage', 'fontStyle', 'textAlignment', 'textColorHex',
+                            'boldBody', 'italicBody', 'photos', 'photoCaptions',
+                            'voiceNoteAudioBase64', 'voiceNoteTranscript', 'voiceDurationSec',
+                            'musicTrackId', 'musicVolume', 'themeId', 'customBgColorHex', 'cardStyle',
+                            'animationEffect', 'envelopeStyle', 'giftBoxStyle', 'selectedGames',
+                            'gameDifficulty', 'gamesMandatory', 'allowSkip', 'secretCodeClue',
+                            'secretCodeAnswer', 'secretPasscode', 'unlockAtMillis', 'eventDateMillis',
+                            'expiresAtMillis', 'status', 'updatedAt', 'publishedAt'
+                          ])) ||
+                         // Branch 2: Recipient opening or replying to a published surprise
+                         (existing().status in ['published', 'opened', 'replied'] &&
+                          incoming().diff(existing()).affectedKeys().hasOnly(['openCount', 'replyCount', 'status', 'updatedAt']) &&
+                          incoming().openCount >= existing().openCount &&
+                          incoming().openCount <= existing().openCount + 1 &&
+                          incoming().replyCount >= existing().replyCount &&
+                          incoming().replyCount <= existing().replyCount + 1 &&
+                          incoming().status in ['opened', 'replied'])
+                       );
+
+      allow delete: if isSignedIn() && isValidId(surpriseId) && existing().creatorUid == request.auth.uid;
+    }
+
+    // 3. Recipient Replies (Validated against published surprise; read/managed strictly by creator)
+    match /replies/{replyId} {
+      allow get: if isSignedIn() && isValidId(replyId) && resource.data.creatorUid == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.creatorUid == request.auth.uid;
+
+      allow create: if isValidId(replyId) &&
+                       incoming().keys().hasAll([
+                         'surpriseId', 'creatorUid', 'surpriseTitle', 'recipientName',
+                         'reaction', 'message', 'emojiTag', 'readFlag', 'createdAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'surpriseId', 'creatorUid', 'surpriseTitle', 'recipientName',
+                         'reaction', 'message', 'emojiTag', 'photoBase64', 'readFlag', 'createdAt'
+                       ]) &&
+                       incoming().readFlag == false &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       isValidReply(incoming()) &&
+                       exists(/databases/$(database)/documents/surprises/$(incoming().surpriseId)) &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.creatorUid == incoming().creatorUid &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.status in ['published', 'opened', 'replied'];
+
+      allow update: if isSignedIn() &&
+                       isValidId(replyId) &&
+                       existing().creatorUid == request.auth.uid &&
+                       incoming().creatorUid == existing().creatorUid &&
+                       incoming().surpriseId == existing().surpriseId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidReply(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['readFlag']);
+
+      allow delete: if isSignedIn() && isValidId(replyId) && existing().creatorUid == request.auth.uid;
+    }
+
+    // 4. Creator Notifications
+    match /notifications/{notificationId} {
+      allow get: if isSignedIn() && isValidId(notificationId) && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      allow create: if isValidId(notificationId) &&
+                       incoming().keys().hasAll([
+                         'userId', 'surpriseId', 'type', 'title', 'message', 'readFlag', 'createdAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'surpriseId', 'type', 'title', 'message', 'readFlag', 'createdAt'
+                       ]) &&
+                       incoming().readFlag == false &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       isValidNotification(incoming()) &&
+                       exists(/databases/$(database)/documents/surprises/$(incoming().surpriseId)) &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.creatorUid == incoming().userId &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.status in ['published', 'opened', 'replied'];
+
+      allow update: if isSignedIn() &&
+                       isValidId(notificationId) &&
+                       existing().userId == request.auth.uid &&
+                       incoming().userId == existing().userId &&
+                       incoming().surpriseId == existing().surpriseId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidNotification(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['readFlag']);
+
+      allow delete: if isSignedIn() && isValidId(notificationId) && existing().userId == request.auth.uid;
+    }
+
+    // 5. Surprise Reveal Events
+    match /surpriseEvents/{eventId} {
+      allow get: if isSignedIn() && isValidId(eventId) && resource.data.creatorUid == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.creatorUid == request.auth.uid;
+
+      allow create: if isValidId(eventId) &&
+                       incoming().keys().hasAll([
+                         'surpriseId', 'creatorUid', 'eventType', 'anonymousSessionId', 'createdAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'surpriseId', 'creatorUid', 'eventType', 'anonymousSessionId', 'createdAt'
+                       ]) &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       isValidSurpriseEvent(incoming()) &&
+                       exists(/databases/$(database)/documents/surprises/$(incoming().surpriseId)) &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.creatorUid == incoming().creatorUid &&
+                       get(/databases/$(database)/documents/surprises/$(incoming().surpriseId)).data.status in ['published', 'opened', 'replied'];
+
+      allow update, delete: if false;
+    }
+  }
+}

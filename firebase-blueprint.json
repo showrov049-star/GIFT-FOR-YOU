@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated Gift For You creator profile and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "Creator display name" },
+        "email": { "type": "string", "description": "Creator email address (private)" },
+        "photoUrl": { "type": "string", "description": "Optional profile photo URL" },
+        "notifyOnOpen": { "type": "boolean", "description": "Notify when a recipient opens a gift" },
+        "notifyOnReply": { "type": "boolean", "description": "Notify when a recipient sends a reply" },
+        "defaultAllowSkip": { "type": "boolean", "description": "Default skip setting for new gifts" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update" }
+      },
+      "required": ["uid", "displayName", "email", "notifyOnOpen", "notifyOnReply", "defaultAllowSkip", "createdAt", "updatedAt"]
+    },
+    "Surprise": {
+      "title": "Surprise",
+      "description": "Personalized digital surprise gift with theme, memories, media, games, and privacy settings.",
+      "type": "object",
+      "properties": {
+        "creatorUid": { "type": "string" },
+        "title": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "senderName": { "type": "string" },
+        "introMessage": { "type": "string" },
+        "mainMessage": { "type": "string" },
+        "fontStyle": { "type": "string", "enum": ["playfair", "poppins", "inter", "handwritten"] },
+        "textAlignment": { "type": "string", "enum": ["start", "center", "end"] },
+        "textColorHex": { "type": "string" },
+        "boldBody": { "type": "boolean" },
+        "italicBody": { "type": "boolean" },
+        "photos": { "type": "array" },
+        "photoCaptions": { "type": "array" },
+        "voiceNoteAudioBase64": { "type": "string" },
+        "voiceNoteTranscript": { "type": "string" },
+        "voiceDurationSec": { "type": "integer" },
+        "musicTrackId": { "type": "string" },
+        "musicVolume": { "type": "number" },
+        "themeId": { "type": "string" },
+        "customBgColorHex": { "type": "string" },
+        "cardStyle": { "type": "string", "enum": ["glass", "polaroid", "parchment", "velvet"] },
+        "animationEffect": { "type": "string", "enum": ["hearts", "sparkles", "petals", "confetti", "stars"] },
+        "envelopeStyle": { "type": "string", "enum": ["wax_seal", "ribbon_fold", "starry_mail"] },
+        "giftBoxStyle": { "type": "string", "enum": ["classic_rose", "lavender_silk", "golden_royal"] },
+        "selectedGames": { "type": "array" },
+        "gameDifficulty": { "type": "string", "enum": ["easy", "medium", "hard"] },
+        "gamesMandatory": { "type": "boolean" },
+        "allowSkip": { "type": "boolean" },
+        "secretCodeClue": { "type": "string" },
+        "secretCodeAnswer": { "type": "string" },
+        "secretPasscode": { "type": "string" },
+        "unlockAtMillis": { "type": "integer" },
+        "eventDateMillis": { "type": "integer" },
+        "expiresAtMillis": { "type": "integer" },
+        "status": { "type": "string", "enum": ["draft", "published", "opened", "replied", "expired"] },
+        "openCount": { "type": "integer" },
+        "replyCount": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "publishedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "creatorUid", "title", "categoryId", "recipientName", "senderName",
+        "introMessage", "mainMessage", "fontStyle", "textAlignment", "textColorHex",
+        "boldBody", "italicBody", "photos", "photoCaptions", "voiceDurationSec",
+        "musicTrackId", "musicVolume", "themeId", "customBgColorHex", "cardStyle",
+        "animationEffect", "envelopeStyle", "giftBoxStyle", "selectedGames",
+        "gameDifficulty", "gamesMandatory", "allowSkip", "secretCodeClue",
+        "secretCodeAnswer", "secretPasscode", "unlockAtMillis", "eventDateMillis",
+        "expiresAtMillis", "status", "openCount", "replyCount", "createdAt", "updatedAt"
+      ]
+    },
+    "SurpriseReply": {
+      "title": "SurpriseReply",
+      "description": "Recipient reaction and heartfelt reply to a published surprise.",
+      "type": "object",
+      "properties": {
+        "surpriseId": { "type": "string" },
+        "creatorUid": { "type": "string" },
+        "surpriseTitle": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "reaction": { "type": "string", "enum": ["loved_it", "so_cute", "made_me_laugh", "emotional", "i_love_it"] },
+        "message": { "type": "string" },
+        "emojiTag": { "type": "string" },
+        "photoBase64": { "type": "string" },
+        "readFlag": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["surpriseId", "creatorUid", "surpriseTitle", "recipientName", "reaction", "message", "emojiTag", "readFlag", "createdAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "In-app notification for surprise creator when a gift is opened or replied to.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "surpriseId": { "type": "string" },
+        "type": { "type": "string", "enum": ["opened", "replied", "reacted"] },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "readFlag": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "surpriseId", "type", "title", "message", "readFlag", "createdAt"]
+    },
+    "SurpriseEvent": {
+      "title": "SurpriseEvent",
+      "description": "Engagement event emitted during recipient surprise reveal.",
+      "type": "object",
+      "properties": {
+        "surpriseId": { "type": "string" },
+        "creatorUid": { "type": "string" },
+        "eventType": { "type": "string", "enum": ["opened", "game_completed", "letter_read", "replied"] },
+        "anonymousSessionId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["surpriseId", "creatorUid", "eventType", "anonymousSessionId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Private creator user profiles and notification preferences."
+    },
+    "/surprises/{surpriseId}": {
+      "schema": { "$ref": "#/entities/Surprise" },
+      "description": "Digital surprises created by authenticated users and opened by unique ID."
+    },
+    "/replies/{replyId}": {
+      "schema": { "$ref": "#/entities/SurpriseReply" },
+      "description": "Replies submitted by recipients and read/managed by the creator."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/AppNotification" },
+      "description": "Creator notifications for gift openings and replies."
+    },
+    "/surpriseEvents/{eventId}": {
+      "schema": { "$ref": "#/entities/SurpriseEvent" },
+      "description": "Surprise reveal telemetry events scoped to creator."
+    }
+  }
+}

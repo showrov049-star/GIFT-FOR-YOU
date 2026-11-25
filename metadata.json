@@ -1,0 +1,6 @@
+{
+  "name": "Gift For You",
+  "description": "Create personalized digital surprise gifts with memories, custom themes, interactive mini-games, and heartfelt replies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

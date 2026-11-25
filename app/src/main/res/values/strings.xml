@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Gift For You</string>
+    <string name="app_tagline">A Little Surprise, A Lot of Happiness.</string>
+    <string name="hero_heading">Make Someone\'s Day Extra Special</string>
+    <string name="hero_subheading">Create beautiful digital surprises, add memories, play fun games, and send a little happiness to someone you love.</string>
+    <string name="cta_create_surprise">Create Your Surprise</string>
+    <string name="cta_open_gift_code">Open a Gift Code</string>
+    <string name="sign_in_google">Continue with Google</string>
+    <string name="action_send_reply">Send My Reply</string>
+    <string name="reply_delivered_msg">Your reply has been delivered!</string>
+    <string name="closing_emotional_quote">Some people make life more beautiful just by being in it. You are one of them.</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="auth_login_title">Sign In</string>
+    <string name="auth_register_title">Create Account</string>
+    <string name="auth_secure_badge">Secured by Firebase Auth</string>
+    <string name="auth_creator_badge">Creator Studio</string>
+    <string name="auth_welcome_back">Welcome Back</string>
+    <string name="auth_login_subtitle">Sign in to manage your digital surprises, gift opens, and heartfelt replies.</string>
+    <string name="auth_create_account_heading">Join Gift For You</string>
+    <string name="auth_register_subtitle">Create your creator profile to craft personalized surprises, mini-games, and keepsake memories.</string>
+    <string name="auth_signing_in">Signing in…</string>
+    <string name="auth_creating_account">Creating account…</string>
+    <string name="auth_signup_google">Create Account with Google</string>
+    <string name="auth_display_name_label">Creator Display Name (Optional)</string>
+    <string name="auth_display_name_placeholder">e.g. Alex</string>
+    <string name="auth_display_name_helper">Used as your default sender name on new surprises</string>
+    <string name="auth_perk_sync">Save, edit, and duplicate surprises across devices</string>
+    <string name="auth_perk_share">Share scannable QR cards and secret gift links</string>
+    <string name="auth_perk_replies">Receive live gift opens and recipient replies</string>
+    <string name="auth_google_only_title">Google Sign-In Active</string>
+    <string name="auth_google_only_note">This project uses Google Sign-In via Firebase Auth. Email and password sign-in requires manual setup in the Firebase Console.</string>
+    <string name="auth_no_account_prompt">New to Gift For You?</string>
+    <string name="auth_create_account">Create Account</string>
+    <string name="auth_have_account_prompt">Already have an account?</string>
+    <string name="auth_sign_in_link">Sign In</string>
+    <string name="auth_recipient_shortcut">Received a Gift? Open With Code</string>
+</resources>
